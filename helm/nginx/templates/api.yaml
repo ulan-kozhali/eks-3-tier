@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.api.name }}
+  labels:
+    app: devops-api
+spec:
+  replicas: {{ .Values.api.replicas }}
+  selector:
+    matchLabels:
+      app: devops-api
+  template:
+    metadata:
+      labels:
+        app: devops-api
+    spec:
+      containers:
+      - name: devops-api
+        image: {{ .Values.api.image }}:{{ .Values.api.tag }}
+        ports:
+        - containerPort: {{ .Values.api.containerPort }}
+        env:
+        - name: PORT
+          valueFrom:
+            configMapKeyRef:
+              name: devops-api-config
+              key: PORT
+        - name: DB
+          valueFrom:
+            configMapKeyRef:
+              name: devops-api-config
+              key: DB
+        - name: DBUSER
+          valueFrom:
+            configMapKeyRef:
+              name: devops-api-config
+              key: DBUSER
+        - name: DBHOST
+          valueFrom:
+            configMapKeyRef:
+              name: devops-api-config
+              key: DBHOST
+        - name: DBPORT
+          valueFrom:
+            configMapKeyRef:
+              name: devops-api-config
+              key: DBPORT
+        - name: DBPASS
+          valueFrom:
+            secretKeyRef:
+              name: devops-api-secret
+              key: DBPASS
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.svc.name }}
+spec:
+  selector:
+    app: devops-api
+  ports:
+    - protocol: TCP
+      port: {{ .Values.svc.port }}
+      targetPort: {{ .Values.svc.targetPort }}
+  type: LoadBalancer

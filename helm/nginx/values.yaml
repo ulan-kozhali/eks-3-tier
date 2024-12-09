@@ -1,0 +1,30 @@
+name: devops-web
+replicas: 3
+strategy:
+  rollingUpdate:
+    maxSurge: 25%
+    maxUnavailable: 25%
+repository:
+  image: ulan025/node-web
+  tag: "1.0.0"
+containerPort: "3000"
+
+service:
+  name: devops-web
+  port: 3000
+  targetPort: 3000
+  type: LoadBalancer
+
+api:
+  name: devops-api
+  replicas: 2
+  image: ulan025/node-api
+  tag: "1.0.0"
+  containerPort: 3001
+
+svc:
+  name: devops-api
+  port: 3001
+  targetPort: 3001
+
+
